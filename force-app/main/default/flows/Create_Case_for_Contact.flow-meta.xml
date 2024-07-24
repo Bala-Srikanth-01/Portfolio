@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dynamicChoiceSets>
+        <name>choiceAllContacts</name>
+        <dataType>String</dataType>
+        <displayField>Name</displayField>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>inputAccountId</elementReference>
+            </value>
+        </filters>
+        <object>Contact</object>
+        <valueField>Id</valueField>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>choicePriorityPicklist</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>Priority</picklistField>
+        <picklistObject>Case</picklistObject>
+    </dynamicChoiceSets>
+    <formulas>
+        <name>frmStatus</name>
+        <dataType>String</dataType>
+        <expression>IF({!CloseCase.value} = TRUE, &quot;Closed&quot;, &quot;New&quot;)</expression>
+    </formulas>
+    <interviewLabel>Create Case for Contact {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create Case for Contact</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordCreates>
+        <name>Create_Case</name>
+        <label>Create Case</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <inputAssignments>
+            <field>AccountId</field>
+            <value>
+                <elementReference>inputAccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>ContactId</field>
+            <value>
+                <elementReference>inputContactId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>ScreenDescription</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <elementReference>frmStatus</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <elementReference>ScreenSubject</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Case</object>
+    </recordCreates>
+    <screens>
+        <name>Questions</name>
+        <label>Questions</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>Questions_Page_2</targetReference>
+        </connector>
+        <fields>
+            <name>SayThisText</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(255, 8, 12); background-color: rgb(247, 247, 249); font-size: 14px;&quot;&gt;Hello Caller&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(247, 247, 249); font-size: 14px; color: rgb(82, 82, 82);&quot;&gt;Thank you for calling Pyroclastic, Inc. We’re sorry you’re having trouble with our products and we want to help you as quickly as possible. Can you please describe the problem you’re having&lt;/span&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>ScreenDescription</name>
+            <fieldText>Problem Description</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>ScreenSubject</name>
+            <dataType>String</dataType>
+            <fieldText>Case Subject</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>CloseCase</name>
+            <extensionName>flowruntime:toggle</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>messageToggleActive</name>
+                <value>
+                    <stringValue>Yes, Solved</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Were you able to solve the customer&apos;s problem during this call?</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>messageToggleInactive</name>
+                <value>
+                    <stringValue>No, Not Solved</stringValue>
+                </value>
+            </inputParameters>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Questions_Page_2</name>
+        <label>Questions Page 2</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>Create_Case</targetReference>
+        </connector>
+        <fields>
+            <name>ScreenPriority</name>
+            <choiceReferences>choicePriorityPicklist</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>What priority would the customer assign to this case?</fieldText>
+            <fieldType>RadioButtons</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>Point_of_Contact</name>
+            <choiceReferences>choiceAllContacts</choiceReferences>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>inputContactId</elementReference>
+            </defaultValue>
+            <fieldText>Point of Contact</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <startElementReference>Questions</startElementReference>
+    <status>Draft</status>
+    <variables>
+        <name>inputAccountId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>inputContactId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
